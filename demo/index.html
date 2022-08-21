@@ -247,12 +247,11 @@
         let token = greedySampling(results.x.data);
 
         if (promptTokens.length == 0) {
+          if(streamingCallback) streamingCallback(token);
           ctx.push( token );
         } else {
           ctx.push( promptTokens.shift() );
         }
-        
-        if(streamingCallback) streamingCallback(token);
 
         feeds.xx_att = results.xx_att_r;
         feeds.aa_att = results.aa_att_r;
