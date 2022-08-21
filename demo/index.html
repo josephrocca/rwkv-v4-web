@@ -8,9 +8,9 @@
 </head>
 <body>
   <h1>RWKV-v4 Web Demo</h1>
-	<p>See <a href="https://github.com/josephrocca/rwkv-v4-web" target="_blank">the Github repo</a> for more details about this demo.</p>
+  <p>See <a href="https://github.com/josephrocca/rwkv-v4-web" target="_blank">the Github repo</a> for more details about this demo.</p>
   
-	<hr>
+  <hr>
 
   <div id="modelChoiceEl">
     <div style="max-width:750px;">Choose a model:</div>
@@ -203,11 +203,11 @@
       });
 
       loadingStatusEl.innerHTML = "Initializing...";
-	    
+      
       let onnxModelBlobUrl = URL.createObjectURL(onnxModelBlob);
 
       session = await ort.InferenceSession.create(onnxModelBlobUrl, sessionOption);
-	    
+      
       URL.revokeObjectURL(onnxModelBlobUrl);
       
     } catch (e) {
@@ -274,6 +274,8 @@
     loadingMessageEl.style.display = "none";
     
     generateButtonEl.onclick = async function() {
+      generateButtonEl.disabled = true;
+	    
       let promptText = promptInputEl.value;
       let numTokensToGenerate = Number(numTokensToGenInputEl.value);
       
@@ -283,7 +285,10 @@
       }
       
       let result = await predictText(promptText, numTokensToGenerate, streamingCallback);
+      
       console.log(result);
+			
+      generateButtonEl.disabled = false;
     };
     
   </script>
