@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>RWKV-v4 Web Demo</title>
+  <script src="github-pages-coop-coep-workaround.js"></script> <!-- This allows us to use wasm threads on Github Pages. -->
+</head>
+<body>
+  <h1>RWKV-v4 Web Demo</h1>
+  
+  <div id="modelChoiceEl">
+    <div style="max-width:750px;">Input a Hugging Face URL to your model or just click "load" to use the default. The URL must be a <u>direct</u> link to the model file. I.e. it must contain <i>/resolve/</i>, not <i>/blob/</i>.</div>
+    <input id="modelUrlInputEl" style="width:700px" value="./rwkv-4-pile-169m-uint8.onnx"><button id="loadBtnEl" onclick="resolveLoadClick()">load</button>
+		<table id="modelTableEl">
+			<tr style="font-weight:bold;">
+				<td>Name</td>
+				<td>Params</td>
+				<td>File size</td>
+				<td>Inference speed</td>
+				<td>Notes</td>
+			</tr>
+			<tr>
+				<td>rwkv-4-pile-169m.onnx</td>
+				<td>169m</td>
+				<td>679 MB</td>
+				<td>~13 tokens/sec</td>
+				<td>-</td>
+				<td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m.onnx'; loadBtnEl.click();">load</button> </td>
+			</tr>
+			<tr>
+				<td>rwkv-4-pile-169m-uint8.onnx</td>
+				<td>169m</td>
+				<td>171 MB</td>
+				<td>~5 tokens/sec</td>
+				<td>uint8 quantized - smaller but slower</td>
+				<td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m-uint8.onnx'; loadBtnEl.click();">load</button> </td>
+			</tr>
+			<tr>
+				<td>rwkv-4-pile-430m.onnx</td>
+				<td>430m</td>
+				<td>1.6 GB</td>
+				<td>?</td>
+				<td>-</td>
+				<td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/430m/rwkv-4-pile-430m.onnx'; loadBtnEl.click();">load</button> </td>
+			</tr>
+			<tr>
+				<td>rwkv-4-pile-430m-uint8.onnx</td>
+				<td>430m</td>
+				<td>434 MB</td>
+				<td>?</td>
+				<td>uint8 quantized - smaller but slower</td>
+				<td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/430m/rwkv-4-pile-430m-uint8.onnx'; loadBtnEl.click();">load</button> </td>
+			</tr>
+		</table>
+		<style>
+			#modelTableEl {
+				border-collapse: collapse;
+				margin-top: 1rem;
+			}
+			#modelTableEl td, #modelTableEl th {
+				border: 1px solid grey;
+			}
+		</style>
+  </div>
+
+  <div id="loadingMessageEl" style="display:none;">
+    <div id="loadingStatusEl">Loading...</div>
+    <progress id="downloadProgressEl"></progress>
+  </div>
+   
+  <div id="inputAreaEl" style="display:none;">
+    <textarea id="promptInputEl" style="width:550px; height:250px;">The capital of France is</textarea>
+    <div>Num tokens to generate: <input id="numTokensToGenInputEl" type="number" value="32" style="width:60px;"></div>
+    <button id="generateButtonEl">generate text</button>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.21.0a2/full/pyodide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.12.0/dist/ort.js"></script>
+  
+  <script type="module">
+    
+		await new Promise(r => window.resolveLoadClick=r); // wait for load button click
+		let onnxModelUrl = modelUrlInputEl.value;
+		
+		modelChoiceEl.style.display = "none";
+		loadingMessageEl.style.display = "";
+
+		window.pyodide = await loadPyodide();
+		await pyodide.loadPackage("micropip");
+
+		// Add tokenizer.json file to Pyodide filesystem:
+		let tokenizerJsonText = await fetch("./tokenizer.json").then(r => r.text())
+		pyodide.FS.writeFile("/tokenizer.json", tokenizerJsonText, { encoding: "utf8" });
+
+		// Install tokenizer:
+		console.log(await pyodide.runPythonAsync(`
+			import sys
+			print(sys.version)
+			import os
+			os.environ["TOKENIZERS_PARALLELISM"] = "0" # This is needed because threading doesn't work in Pyodide yet: https://github.com/pyodide/pyodide/issues/2816#issue-1290719241
+			import micropip
+			await micropip.install('./tokenizers_python-0.11.0-cp310-cp310-emscripten_3_1_14_wasm32.whl')
+			from tokenizers import Tokenizer
+			tokenizer = Tokenizer.from_file("/tokenizer.json")
+		`));
+		
+		function textToTokens(text) {
+			pyodide.globals.set("input_text", text);
+			pyodide.runPython(`
+				encoded = tokenizer.encode(input_text)
+				ids = encoded.ids
+				tokens = encoded.tokens
+			`);
+			// pyodide.globals.get('tokens').toJs()
+			return pyodide.globals.get('ids').toJs();
+		}
+		
+		function tokensToText(tokens) {
+			pyodide.globals.set("input_tokens", tokens.join(","));
+			pyodide.runPython(`
+				input_tokens = [int(x) for x in input_tokens.split(',')]
+				decoded = tokenizer.decode(input_tokens)
+			`);
+			return pyodide.globals.get('decoded');
+		}
+		
+		function padLeftWithZeros(arr, size) {
+			arr = arr.slice(0);
+
+			while (arr.length < size) {
+				arr.unshift(0);
+			}
+
+			return arr;
+		}
+
+		function greedySampling(x) {
+			let max_k = 0;
+			let max_v = x[0];
+
+			for (let i = 1; i < 50277; i++) {
+				if (x[i] > max_v) {
+					max_v = x[i];
+					max_k = i;
+				}
+			}
+
+			return max_k;
+		}
+
+
+		function downloadBlobWithProgress(url, onProgress) {
+			return new Promise((res, rej) => {
+				var blob;
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', url, true);
+				xhr.responseType = 'arraybuffer';
+				xhr.onload = function(e) {
+					blob = new Blob([this.response]);   
+				};
+				xhr.onprogress = onProgress;
+				xhr.onloadend = function(e){
+					res(blob);
+				}
+				xhr.send();
+			});
+		}
+
+
+		let session;
+		try {
+			ort.env.wasm.proxy = true; // <-- When using wasm, proxy inference via a web worker so it doesn't freeze the main/rendering thread.
+			
+			if(self.crossOriginIsolated) { // needs to be cross-origin-isolated to use wasm threads. you need to serve this html file with these two headers: https://web.dev/coop-coep/
+				ort.env.wasm.numThreads = navigator.hardwareConcurrency / 2;
+			}
+			
+			ort.logLevel = "verbose";
+			ort.logLevelInternal = "verbose";
+
+			const sessionOption = {
+				//executionProviders: ['webgl'],
+				graphOptimizationLevel: 'all',
+			}
+
+			let onnxModelBlob = await downloadBlobWithProgress(onnxModelUrl, function(e) {
+				let ratio = e.loaded / e.total;
+				downloadProgressEl.value = ratio;
+				loadingStatusEl.innerHTML = "Downloading..." + Math.round(ratio*e.total/1e6)+" MB";
+			});
+
+			loadingStatusEl.innerHTML = "Initializing...";
+
+			// create a new session and load the specific model.
+			session = await ort.InferenceSession.create(onnxModelUrl, sessionOption);
+			
+		} catch (e) {
+			console.log(`Failed to load ONNX model: ${e}.`);
+			console.error(e);
+		}
+		
+		async function predictText(promptText, numTokensToGenerate=32, streamingCallback=null) {
+
+			let startTime = Date.now();
+
+			const xx_att_d = new Float32Array(12*768);
+			const aa_att_d = new Float32Array(12*768);
+			const bb_att_d = new Float32Array(12*768);
+			const pp_att_d = new Float32Array(12*768);
+			const xx_ffn_d = new Float32Array(12*768);
+
+			pp_att_d.fill(-1e30);
+
+			const xx_att = new ort.Tensor('float32', xx_att_d, [12, 768]);
+			const aa_att = new ort.Tensor('float32', aa_att_d, [12, 768]);
+			const bb_att = new ort.Tensor('float32', bb_att_d, [12, 768]);
+			const pp_att = new ort.Tensor('float32', pp_att_d, [12, 768]);
+			const xx_ffn = new ort.Tensor('float32', xx_ffn_d, [12, 768]);
+
+			// prepare feeds. use model input names as keys.
+			let feeds = { idx: null, xx_att: xx_att, aa_att: aa_att, bb_att: bb_att, pp_att: pp_att, xx_ffn: xx_ffn };
+
+			let promptTokens = textToTokens(promptText);
+			let ctx = [ promptTokens.shift() ];
+
+			// feed inputs and run
+			for (let i = 0; i < numTokensToGenerate; i++) {
+				let idx_d = Int32Array.from( padLeftWithZeros(ctx, 1024) );
+				let idx = new ort.Tensor('int32', idx_d, [1024]);
+
+				feeds.idx = idx;
+
+				let results = await session.run(feeds);
+				let token = greedySampling(results.x.data);
+
+				if (promptTokens.length == 0) {
+					ctx.push( token );
+				} else {
+					ctx.push( promptTokens.shift() );
+				}
+				
+				if(streamingCallback) streamingCallback(token);
+
+				feeds.xx_att = results.xx_att_r;
+				feeds.aa_att = results.aa_att_r;
+				feeds.bb_att = results.bb_att_r;
+				feeds.pp_att = results.pp_att_r;
+				feeds.xx_ffn = results.xx_ffn_r;
+
+				console.log(`Progress: ${i+1}/${numTokensToGenerate}`);
+			}
+
+			console.log(`Finished. Took ${Date.now()-startTime}ms`);
+
+			return tokensToText(ctx);
+		}
+		
+		inputAreaEl.style.display = "";
+		loadingMessageEl.style.display = "none";
+		
+		generateButtonEl.onclick = async function() {
+			let promptText = promptInputEl.value;
+			let numTokensToGenerate = Number(numTokensToGenInputEl.value);
+			
+			async function streamingCallback(token) {
+				let text = tokensToText([token]);
+				promptInputEl.value += text;
+			}
+			
+			let result = await predictText(promptText, numTokensToGenerate, streamingCallback);
+			console.log(result);
+		};
+    
+  </script>
+</body>
+</html>
