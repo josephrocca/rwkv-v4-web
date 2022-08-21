@@ -275,6 +275,7 @@
     
     generateButtonEl.onclick = async function() {
       generateButtonEl.disabled = true;
+	    generateButtonEl.innerHTML = "Loading...";
 	    
       let promptText = promptInputEl.value;
       let numTokensToGenerate = Number(numTokensToGenInputEl.value);
@@ -289,6 +290,7 @@
       console.log(result);
 			
       generateButtonEl.disabled = false;
+			generateButtonEl.innerHTML = "generate";
     };
     
   </script>
