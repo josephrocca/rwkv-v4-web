@@ -203,9 +203,12 @@
       });
 
       loadingStatusEl.innerHTML = "Initializing...";
+	    
+      let onnxModelBlobUrl = URL.createObjectURL(onnxModelBlob);
 
-      // create a new session and load the specific model.
-      session = await ort.InferenceSession.create(onnxModelUrl, sessionOption);
+      session = await ort.InferenceSession.create(onnxModelBlobUrl, sessionOption);
+	    
+      URL.revokeObjectURL(onnxModelBlobUrl);
       
     } catch (e) {
       console.log(`Failed to load ONNX model: ${e}.`);
