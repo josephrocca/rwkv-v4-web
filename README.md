@@ -6,3 +6,6 @@ BlinkDL's RWKV-v4 running in the browser. [Thanks to @AXKuhta](https://github.co
 * **Hugging Face repo**: https://huggingface.co/rocca/rwkv-4-pile-web
 
 See the [@BlinkDL/RWKV-LM](https://github.com/BlinkDL/RWKV-LM) repo for more info on RWKV-LM.
+
+**TODO**:
+* Optimise loop per AXKuhta's recommendations: https://github.com/BlinkDL/RWKV-LM/issues/7#issuecomment-1227341575
