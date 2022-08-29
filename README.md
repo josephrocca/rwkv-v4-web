@@ -9,3 +9,4 @@ See the [@BlinkDL/RWKV-LM](https://github.com/BlinkDL/RWKV-LM) repo for more inf
 
 **TODO**:
 * Optimise loop per AXKuhta's recommendations: https://github.com/BlinkDL/RWKV-LM/issues/7#issuecomment-1227341575
+* Speed up the initial-state-computation when the code becomes available: https://github.com/BlinkDL/RWKV-LM/issues/7#issuecomment-1228739721
