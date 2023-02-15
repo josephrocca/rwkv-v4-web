@@ -126,7 +126,7 @@ Sam:">chat</option>
     <script>
       promptInputEl.value = exampleSelectorEl.querySelectorAll("option")[0].value;
     </script>
-    <div>Num output tokens (including prompt): <input id="numTokensToGenInputEl" type="number" value="64" style="width:60px;"> <span id="progressDisplayEl"></span> <span id="tokensPerSecDisplayEl"></span></div>
+    <div>Num output tokens (including prompt): <input id="numTokensToGenInputEl" type="number" value="64" style="width:60px;"> <span id="progressDisplayEl"></span> <span id="tokensPerSecDisplayEl" style="opacity:0.6"></span></div>
     <button id="generateButtonEl">generate text</button>
   </div>
   
@@ -333,7 +333,7 @@ Sam:">chat</option>
       
       let timeTaken = Date.now() - startTime;
       console.log(`Finished. Took ${timeTaken}ms`);
-      tokensPerSecDisplayEl.innerHTML = `${(numTokensToGenerate/(timeTaken/1000)).toFixed(2)} tokens/sec`;
+      tokensPerSecDisplayEl.innerHTML = `(${(numTokensToGenerate/(timeTaken/1000)).toFixed(2)} tokens/sec)`;
 
       return tokensToText(ctx);
     }
