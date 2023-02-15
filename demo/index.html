@@ -34,7 +34,7 @@
         <td>rwkv-4-pile-169m-uint8.onnx</td>
         <td>169m</td>
         <td>171 MB</td>
-        <td>~5 tokens/sec</td>
+        <td>~7 tokens/sec</td>
         <td>uint8 quantized - smaller but slower</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m-uint8.onnx'; modelNumLayersEl.value='12'; modelEmbedDimEl.value='768'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
       </tr>
@@ -66,8 +66,8 @@
         <td>rwkv-4-pile-430m-uint8.onnx</td>
         <td>430m</td>
         <td>434 MB</td>
-        <td>~2.5 tokens/sec</td>
-        <td>best, but slow</td>
+        <td>~6 tokens/sec</td>
+        <td>small, fast</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/430m/rwkv-4-pile-430m-uint8.onnx'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
       </tr>
       <tr>
@@ -104,8 +104,9 @@
   </div>
    
   <div id="inputAreaEl" style="display:none;">
+    <div style="modelInfoDisplayEl" style="opacity:0.5"></div>
     <textarea id="promptInputEl" style="width:550px; height:250px;">The capital of France is</textarea>
-    <div>Num output tokens (including prompt): <input id="numTokensToGenInputEl" type="number" value="64" style="width:60px;"> <span id="progressDisplayEl"></span></div>
+    <div>Num output tokens (including prompt): <input id="numTokensToGenInputEl" type="number" value="64" style="width:60px;"> <span id="progressDisplayEl"></span> <span id="tokensPerSecDisplayEl"></span></div>
     <button id="generateButtonEl">generate text</button>
   </div>
   
@@ -120,6 +121,8 @@
     let n_layer = Number(modelNumLayersEl.value);
     let n_embd = Number(modelEmbedDimEl.value);
 		let backend = backendEl.value;
+    
+    modelInfoDisplayEl.innerHTML = `<b>url:</b>${onnxModelUrl} <b>n_layer:</b>${n_layer} <b>n_embd:</b>${n_embd} <b>backend:</b>${backend}`;
     
     modelChoiceEl.style.display = "none";
     loadingMessageEl.style.display = "";
@@ -307,8 +310,10 @@
 
         progressDisplayEl.innerHTML = `Progress: ${i+1}/${numTokensToGenerate}`;
       }
-
-      console.log(`Finished. Took ${Date.now()-startTime}ms`);
+      
+      let timeTaken = Date.now() - startTime;
+      console.log(`Finished. Took ${timeTaken}ms`);
+	    tokensPerSecDisplayEl.innerHTMl = `${(numTokensToGenerate/(timeTaken/1000)).toFixed(2)} tokens/sec`;
 
       return tokensToText(ctx);
     }
@@ -319,6 +324,8 @@
     generateButtonEl.onclick = async function() {
       generateButtonEl.disabled = true;
 	    generateButtonEl.innerHTML = "Loading...";
+      
+      tokensPerSecDisplayEl.innerHTMl = "";
 	    
       let promptText = promptInputEl.value;
       let numTokensToGenerate = Number(numTokensToGenInputEl.value);
