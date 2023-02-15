@@ -8,7 +8,7 @@
 </head>
 <body>
   <h1>RWKV-v4 Web Demo</h1>
-  <p>See <a href="https://github.com/josephrocca/rwkv-v4-web" target="_blank">the Github repo</a> for more details about this demo. The inference speed numbers are just for my laptop - consider them as relative numbers at most. Obviously varies by device.</p>
+  <p>See <a href="https://github.com/josephrocca/rwkv-v4-web" target="_blank">the Github repo</a> for more details about this demo. The inference speed numbers are just for my laptop - consider them as relative numbers at most. Obviously varies by device. Note that opening the browser console/DevTools currently slows down inference, even after you close it.</p>
   
   <hr>
 
@@ -26,7 +26,7 @@
         <td>rwkv-4-pile-169m.onnx</td>
         <td>169m</td>
         <td>679 MB</td>
-        <td>~13 tokens/sec</td>
+        <td>~32 tokens/sec</td>
         <td>-</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m.onnx'; modelNumLayersEl.value='12'; modelEmbedDimEl.value='768'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
       </tr>
@@ -34,7 +34,7 @@
         <td>rwkv-4-pile-169m-uint8.onnx</td>
         <td>169m</td>
         <td>171 MB</td>
-        <td>~7 tokens/sec</td>
+        <td>~12 tokens/sec</td>
         <td>uint8 quantized - smaller but slower</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m-uint8.onnx'; modelNumLayersEl.value='12'; modelEmbedDimEl.value='768'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
       </tr>
@@ -58,16 +58,16 @@
         <td>rwkv-4-pile-430m.with_runtime_opt.ort</td>
         <td>430m</td>
         <td>1.73 GB</td>
-        <td>~6 tokens/sec</td>
+        <td>~12 tokens/sec</td>
         <td>ORT format</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/430m/rwkv-4-pile-430m.with_runtime_opt.ort'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
       </tr>
-      <tr style="background: #aeffae;">
+      <tr>
         <td>rwkv-4-pile-430m-uint8.onnx</td>
         <td>430m</td>
         <td>434 MB</td>
-        <td>~6 tokens/sec</td>
-        <td>small, fast</td>
+        <td>~4 tokens/sec</td>
+        <td>small, fast-ish</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/430m/rwkv-4-pile-430m-uint8.onnx'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
       </tr>
       <tr>
