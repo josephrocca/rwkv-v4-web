@@ -105,7 +105,8 @@
    
   <div id="inputAreaEl" style="display:none;">
     <div id="modelInfoDisplayEl" style="opacity:0.5"></div>
-    <select onchange="promptInputEl.value=this.value;">
+    <select id="exampleSelectorEl" onchange="promptInputEl.value=this.value;">
+      <option value="dog --> fur --> soft --> teddy --> bear --> mammal --> taxonomy --> hierarchy --> king --> medieval -->">relationship chain</option>
       <option value="The capital of Australia is Canberra.
 The capital of France is Paris.
 The capital of Peru is">country capitals</option>
@@ -121,7 +122,10 @@ Sam: No, what happened?
 Jamie: They're finally trialling gene drives to combat malaria in Nigeria!
 Sam:">chat</option>
     </select>
-    <textarea id="promptInputEl" style="width:550px; height:250px;">The capital of France is</textarea>
+    <textarea id="promptInputEl" style="width:550px; height:250px;"></textarea>
+    <script>
+      promptInputEl.value = exampleSelectorEl.querySelectorAll("option")[0].value;
+    </script>
     <div>Num output tokens (including prompt): <input id="numTokensToGenInputEl" type="number" value="64" style="width:60px;"> <span id="progressDisplayEl"></span> <span id="tokensPerSecDisplayEl"></span></div>
     <button id="generateButtonEl">generate text</button>
   </div>
@@ -329,7 +333,7 @@ Sam:">chat</option>
       
       let timeTaken = Date.now() - startTime;
       console.log(`Finished. Took ${timeTaken}ms`);
-	    tokensPerSecDisplayEl.innerHTMl = `${(numTokensToGenerate/(timeTaken/1000)).toFixed(2)} tokens/sec`;
+      tokensPerSecDisplayEl.innerHTML = `${(numTokensToGenerate/(timeTaken/1000)).toFixed(2)} tokens/sec`;
 
       return tokensToText(ctx);
     }
@@ -339,7 +343,7 @@ Sam:">chat</option>
     
     generateButtonEl.onclick = async function() {
       generateButtonEl.disabled = true;
-	    generateButtonEl.innerHTML = "Loading...";
+      generateButtonEl.innerHTML = "Loading...";
       
       tokensPerSecDisplayEl.innerHTMl = "";
 	    
@@ -356,7 +360,7 @@ Sam:">chat</option>
       console.log(result);
 			
       generateButtonEl.disabled = false;
-			generateButtonEl.innerHTML = "generate";
+      generateButtonEl.innerHTML = "generate";
     };
     
   </script>
