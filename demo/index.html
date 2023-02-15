@@ -54,12 +54,12 @@
         <td style="color:red;">"RuntimeError: Aborted()" - too big to init</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/430m/rwkv-4-pile-430m.onnx'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
       </tr>
-      <tr style="opacity:0.3;">
+      <tr>
         <td>rwkv-4-pile-430m.with_runtime_opt.ort</td>
         <td>430m</td>
         <td>1.73 GB</td>
         <td>~6 tokens/sec</td>
-        <td style="color:red;">ORT format</td>
+        <td>ORT format</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/430m/rwkv-4-pile-430m.with_runtime_opt.ort'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
       </tr>
       <tr style="background: #aeffae;">
