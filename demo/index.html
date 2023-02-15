@@ -105,7 +105,7 @@
    
   <div id="inputAreaEl" style="display:none;">
     <textarea id="promptInputEl" style="width:550px; height:250px;">The capital of France is</textarea>
-    <div>Num tokens to generate: <input id="numTokensToGenInputEl" type="number" value="32" style="width:60px;"> <span id="progressDisplayEl"></span></div>
+    <div>Num output tokens (including prompt): <input id="numTokensToGenInputEl" type="number" value="64" style="width:60px;"> <span id="progressDisplayEl"></span></div>
     <button id="generateButtonEl">generate text</button>
   </div>
   
@@ -223,20 +223,20 @@
       };
 	    
       if(new URL(onnxModelUrl).pathname.endsWith(".ort")) {
-				// See here for details: github.com/microsoft/onnxruntime/issues/13445#issuecomment-1430153341
+        // See here for details: github.com/microsoft/onnxruntime/issues/13445#issuecomment-1430153341
         sessionOptions = {
-					executionProviders: [ backend ],
-					enableMemPattern: false,
-					enableCpuMemArena: false,
-					extra: {
-						session: {
-							disable_prepacking: "1",
-							use_device_allocator_for_initializers: "0",
-							use_ort_model_bytes_directly: "1",
-							use_ort_model_bytes_for_initializers: "1",
-						},
-					},
-				};
+          executionProviders: [ backend ],
+          enableMemPattern: false,
+          enableCpuMemArena: false,
+          extra: {
+            session: {
+              disable_prepacking: "1",
+              use_device_allocator_for_initializers: "0",
+              use_ort_model_bytes_directly: "1",
+              use_ort_model_bytes_for_initializers: "1",
+            },
+          },
+        };
       }
 
       let onnxModelBlob = await downloadBlobWithProgress(onnxModelUrl, function(e) {
