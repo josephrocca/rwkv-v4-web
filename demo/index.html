@@ -106,7 +106,6 @@
   <div id="inputAreaEl" style="display:none;">
     <div id="modelInfoDisplayEl" style="opacity:0.5"></div>
     <select id="exampleSelectorEl" onchange="promptInputEl.value=this.value;">
-      <option value="dog --> fur --> soft --> teddy --> bear --> mammal --> taxonomy --> hierarchy --> king --> medieval -->">relationship chain</option>
       <option value="The capital of Australia is Canberra.
 The capital of France is Paris.
 The capital of Peru is">country capitals</option>
@@ -116,11 +115,11 @@ The capital of Peru is">country capitals</option>
 7*2+31=">basic math</option>
       <option value="QUESTION: The house is empty. Two people talk into the house. One person walks out, but then walks back in. A dog walks into the house. A person walks out of the house. How many people are in the house?
 ANSWER: Let's think step by step.">word problem</option>
-    </select>
       <option value="Jamie: Hey, did you hear the news?
 Sam: No, what happened?
 Jamie: They're finally trialling gene drives to combat malaria in Nigeria!
 Sam:">chat</option>
+      <option value="dog --> fur --> soft --> teddy --> bear --> mammal --> taxonomy --> hierarchy --> king --> medieval -->">relationship chain</option>
     </select>
     <textarea id="promptInputEl" style="width:550px; height:250px;"></textarea>
     <script>
