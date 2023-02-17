@@ -34,10 +34,7 @@ Then open `http://localhost:8080/`
 
 If you hit the huggingface endpoint too often, it will start failing your downloads.
 
-I recommend downloading the onnx file (e.g. `https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m-uint8.onnx`) into the `demo/` folder, then loading it locally like:
-
-http://localhost:8080/rwkv-4-pile-169m-uint8.onnx
-
+I recommend downloading the onnx file (e.g. `https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m-uint8.onnx`) into the `demo/` folder, then using the `load local copy` button.
 
 **TODO**:
 * Optimise loop per AXKuhta's recommendations: https://github.com/BlinkDL/RWKV-LM/issues/7#issuecomment-1227341575
