@@ -215,16 +215,19 @@ Sam:">chat</option>
 
     function downloadBlobWithProgress(url, onProgress) {
       return new Promise((res, rej) => {
-        var blob;
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'arraybuffer';
-        xhr.onload = function(e) {
-          blob = new Blob([this.response]);   
+        xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            res(new Blob([this.response]));
+          } else {
+            rej(`Loading model error: ${xhr.status}: ${xhr.statusText}`);
+          }
         };
         xhr.onprogress = onProgress;
-        xhr.onloadend = function(e){
-          res(blob);
+        xhr.onerror = function(){
+          rej(`Loading model error: ${xhr.status}: ${xhr.statusText}`);
         }
         xhr.send();
       });
@@ -269,6 +272,9 @@ Sam:">chat</option>
         downloadProgressEl.value = ratio;
         loadingStatusEl.innerHTML = "Downloading..." + Math.round(ratio*e.total/1e6)+" MB";
       });
+      if (!onnxModelBlob) {
+        throw new Error("Failed to download model");
+      }
 
       loadingStatusEl.innerHTML = "Initializing...";
       
