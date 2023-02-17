@@ -218,16 +218,24 @@ Sam:">chat</option>
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'arraybuffer';
-        xhr.onload = function() {
-          if (xhr.status >= 200 && xhr.status < 300) {
+        xhr.onload = function(e) {
+          if ((xhr.status >= 200 && xhr.status < 300) || (xhr.status === 0 /* Loaded from local file */)) {
             res(new Blob([this.response]));
           } else {
+            console.log('onload: Loading model error', xhr, e);
             rej(`Loading model error: ${xhr.status}: ${xhr.statusText}`);
           }
         };
         xhr.onprogress = onProgress;
-        xhr.onerror = function(){
-          rej(`Loading model error: ${xhr.status}: ${xhr.statusText}`);
+        xhr.onerror = function(e){
+          console.log('onerror: Loading model error', xhr, e);
+          if (xhr.status === 0 && !xhr.statusText) {
+            // There's no information to show
+            // https://bugs.chromium.org/p/chromium/issues/detail?id=118096
+            rej('Failed to load the model.  This can happen if you are hitting the end point too often.  Try just waiting.')
+          } else {
+            rej(`Loading model error: ${xhr.status}: ${xhr.statusText}`);
+          }
         }
         xhr.send();
       });
@@ -291,7 +299,7 @@ Sam:">chat</option>
       console.error(e);
     }
     
-    async function predictText(promptText, numTokensToGenerate=32, streamingCallback=null) {
+    async function predictText(promptText, numTokensToGenerate=32, streamingCallback=null, abortSignal=undefined) {
 
       let startTime = Date.now();
 
@@ -317,12 +325,19 @@ Sam:">chat</option>
 
       // feed inputs and run
       for (let i = 0; i < numTokensToGenerate; i++) {
+        if(abortSignal && abortSignal.cancelled) {
+          break;
+        }
         let idx_d = Int32Array.from( padLeftWithZeros(ctx, 1024) );
         let idx = new ort.Tensor('int32', idx_d, [1024]);
 
         feeds.idx = idx;
 
         let results = await session.run(feeds);
+        if(abortSignal && abortSignal.cancelled) {
+          progressDisplayEl.innerHTML = "";
+          break;
+        }
         let token = greedySampling(results.x.data);
 
         if (promptTokens.length == 0) {
@@ -351,9 +366,15 @@ Sam:">chat</option>
     inputAreaEl.style.display = "";
     loadingMessageEl.style.display = "none";
     
-    generateButtonEl.onclick = async function() {
-      generateButtonEl.disabled = true;
-      generateButtonEl.innerHTML = "Loading...";
+    const abortSignal = { cancelled: false }; 
+    async function stop() {
+      abortSignal.cancelled = true;
+    }
+    async function generate() {
+      abortSignal.cancelled = false;
+      generateButtonEl.disabled = false;
+      generateButtonEl.innerHTML = "Stop";
+      generateButtonEl.onclick = stop;
       
       tokensPerSecDisplayEl.innerHTMl = "";
 	    
@@ -365,13 +386,16 @@ Sam:">chat</option>
         promptInputEl.value += text;
       }
       
-      let result = await predictText(promptText, numTokensToGenerate, streamingCallback);
+      let result = await predictText(promptText, numTokensToGenerate, streamingCallback, abortSignal);
       
       console.log(result);
 			
       generateButtonEl.disabled = false;
-      generateButtonEl.innerHTML = "generate";
+      generateButtonEl.innerHTML = "Generate";
+      generateButtonEl.onclick = generate;
     };
+    generateButtonEl.onclick = generate;
+
     
   </script>
 </body>
