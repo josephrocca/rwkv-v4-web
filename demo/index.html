@@ -127,6 +127,8 @@ Sam:">chat</option>
     </script>
     <div>Num output tokens (including prompt): <input id="numTokensToGenInputEl" type="number" value="128" style="width:60px;"> <span id="progressDisplayEl"></span> <span id="tokensPerSecDisplayEl" style="opacity:0.6"></span></div>
     <button id="generateButtonEl">generate text</button>
+    <div id="errorMessageEl" style="display:block; color: red;">
+    </div>
   </div>
   
   <script src="https://cdn.jsdelivr.net/pyodide/v0.21.0a2/full/pyodide.js"></script>
@@ -145,6 +147,7 @@ Sam:">chat</option>
     
     modelChoiceEl.style.display = "none";
     loadingMessageEl.style.display = "";
+    errorMessageEl.innerHTML = "";
 
     window.pyodide = await loadPyodide();
     await pyodide.loadPackage("micropip");
@@ -276,7 +279,9 @@ Sam:">chat</option>
       URL.revokeObjectURL(onnxModelBlobUrl);
       
     } catch (e) {
-      console.log(`Failed to load ONNX model: ${e}.`);
+      const errStr = `Failed to load ONNX model: ${e}.`;
+      console.log(errStr);
+      errorMessageEl.innerHTML=errStr;
       console.error(e);
     }
     
