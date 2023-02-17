@@ -9,6 +9,8 @@ See the [@BlinkDL/RWKV-LM](https://github.com/BlinkDL/RWKV-LM) repo for more inf
 
 # Local Development
 
+## Serving
+
 Note that we require the html file is served with:
 
 ```
@@ -27,6 +29,14 @@ npx servez --shared-array-buffers --local demo
 ```
 
 Then open `http://localhost:8080/`
+
+## Loading the model
+
+If you hit the huggingface endpoint too often, it will start failing your downloads.
+
+I recommend downloading the onnx file (e.g. `https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m-uint8.onnx`) into the `demo/` folder, then loading it locally like:
+
+http://localhost:8080/rwkv-4-pile-169m-uint8.onnx
 
 
 **TODO**:

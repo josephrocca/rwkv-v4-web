@@ -232,7 +232,7 @@ Sam:">chat</option>
           if (xhr.status === 0 && !xhr.statusText) {
             // There's no information to show
             // https://bugs.chromium.org/p/chromium/issues/detail?id=118096
-            rej('Failed to load the model.  This can happen if you are hitting the end point too often.  Try just waiting.')
+            rej('Failed to load the model.  This can happen if you are hitting the end point too often.  Try just waiting and trying again a bit later.')
           } else {
             rej(`Loading model error: ${xhr.status}: ${xhr.statusText}`);
           }
@@ -321,10 +321,11 @@ Sam:">chat</option>
       let feeds = { idx: null, xx_att: xx_att, aa_att: aa_att, bb_att: bb_att, pp_att: pp_att, xx_ffn: xx_ffn };
 
       let promptTokens = textToTokens(promptText);
+      const origPromptTokensLength = promptTokens.length;
       let ctx = [ promptTokens.shift() ];
 
       // feed inputs and run
-      for (let i = 0; i < numTokensToGenerate; i++) {
+      for (var i = 0; i < numTokensToGenerate; i++) {
         if(abortSignal && abortSignal.cancelled) {
           break;
         }
@@ -343,8 +344,10 @@ Sam:">chat</option>
         if (promptTokens.length == 0) {
           if(streamingCallback) streamingCallback(token);
           ctx.push( token );
+          progressDisplayEl.innerHTML = `Output Progress: ${i+1 - origPromptTokensLength}/${numTokensToGenerate - origPromptTokensLength}`;
         } else {
           ctx.push( promptTokens.shift() );
+          progressDisplayEl.innerHTML = `Reading prompt progress: ${i+1}/${origPromptTokensLength}`;
         }
 
         feeds.xx_att = results.xx_att_r;
@@ -352,13 +355,11 @@ Sam:">chat</option>
         feeds.bb_att = results.bb_att_r;
         feeds.pp_att = results.pp_att_r;
         feeds.xx_ffn = results.xx_ffn_r;
-
-        progressDisplayEl.innerHTML = `Progress: ${i+1}/${numTokensToGenerate}`;
       }
       
       let timeTaken = Date.now() - startTime;
       console.log(`Finished. Took ${timeTaken}ms`);
-      tokensPerSecDisplayEl.innerHTML = `(${(numTokensToGenerate/(timeTaken/1000)).toFixed(2)} tokens/sec)`;
+      tokensPerSecDisplayEl.innerHTML = `(${((i+1)/(timeTaken/1000)).toFixed(2)} tokens/sec)`;
 
       return tokensToText(ctx);
     }
@@ -375,6 +376,7 @@ Sam:">chat</option>
       generateButtonEl.disabled = false;
       generateButtonEl.innerHTML = "Stop";
       generateButtonEl.onclick = stop;
+      generateButtonEl.style.color = "red";
       
       tokensPerSecDisplayEl.innerHTMl = "";
 	    
@@ -393,6 +395,7 @@ Sam:">chat</option>
       generateButtonEl.disabled = false;
       generateButtonEl.innerHTML = "Generate";
       generateButtonEl.onclick = generate;
+      generateButtonEl.style.color = "";
     };
     generateButtonEl.onclick = generate;
 
