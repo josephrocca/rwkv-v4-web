@@ -113,25 +113,36 @@
    
   <div id="inputAreaEl" style="display:none;">
     <div id="modelInfoDisplayEl" style="opacity:0.5"></div>
-    <select id="exampleSelectorEl" onchange="promptInputEl.value=this.value;" style="display:block;">
-      <option value="The capital of Australia is Canberra.
-The capital of France is Paris.
-The capital of Peru is">country capitals</option>
-      <option value="7*3=21
-21+2=23
-1+2*4=9
-7*2+31=">basic math</option>
-      <option value="QUESTION: The house is empty. Two people talk into the house. One person walks out, but then walks back in. A dog walks into the house. A person walks out of the house. How many people are in the house?
-ANSWER: Let's think step by step. First,">word problem</option>
-      <option value="Jamie: Hey, did you hear the news?
-Sam: No, what happened?
-Jamie: They're finally trialling gene drives to combat malaria in Nigeria!
-Sam:">chat</option>
-      <option value="dog --> fur --> soft --> teddy --> bear --> mammal --> taxonomy --> hierarchy --> king --> medieval -->">relationship chain</option>
-    </select>
+    <div style="display:flex; gap:10px">
+      <select id="exampleSelectorEl" onchange="promptInputEl.value=this.value;" style="display:block;">
+        <option default value="The capital of Australia is Canberra.
+  The capital of France is Paris.
+  The capital of Peru is">country capitals</option>
+        <option value="7*3=21
+  21+2=23
+  1+2*4=9
+  7*2+31=">basic math</option>
+        <option value="QUESTION: The house is empty. Two people talk into the house. One person walks out, but then walks back in. A dog walks into the house. A person walks out of the house. How many people are in the house?
+  ANSWER: Let's think step by step. First,">word problem</option>
+        <option value="Jamie: Hey, did you hear the news?
+  Sam: No, what happened?
+  Jamie: They're finally trialling gene drives to combat malaria in Nigeria!
+  Sam:">chat</option>
+        <option value="dog --> fur --> soft --> teddy --> bear --> mammal --> taxonomy --> hierarchy --> king --> medieval -->">relationship chain</option>
+      </select>
+      <select id="samplingSelectorEl" onchange="samplingSelectorEl.value=this.value; multinomialOptions.style.display= (this.value === 'multinomial' ? 'contents':'none')" style="display:block;">
+        <option default value="multinomial">Multinomial sampling</option>
+        <option value="greedy">Greedy</option>
+      </select>
+      <div id="multinomialOptions">
+        <div>temp:<input id="tempEl" value="0.5" style="width:60px;"></div>
+        <div>top_p:<input id="topPEl" value="0.8" style="width:60px;"></div>
+      </div>
+    </div>
     <textarea id="promptInputEl" style="width:550px; height:250px;"></textarea>
     <script>
       promptInputEl.value = exampleSelectorEl.querySelectorAll("option")[0].value;
+      multinomialOptions.style.display = "contents";
     </script>
     <div>Num output tokens (including prompt): <input id="numTokensToGenInputEl" type="number" value="128" style="width:60px;"> <span id="progressDisplayEl"></span> <span id="tokensPerSecDisplayEl" style="opacity:0.6"></span></div>
     <button id="generateButtonEl">generate text</button>
@@ -319,6 +330,10 @@ Sam:">chat</option>
       const origPromptTokensLength = promptTokens.length;
       let ctx = [ promptTokens.shift() ];
 
+      const multinomialSampling = samplingSelectorEl.value === 'multinomial';
+      const temp = parseFloat(tempEl.value);
+      const topP = parseFloat(topPEl.value);
+      
       // feed inputs and run
       for (var i = 0; i < numTokensToGenerate; i++) {
         if(abortSignal && abortSignal.cancelled) {
@@ -336,10 +351,14 @@ Sam:">chat</option>
         }
 
         if (promptTokens.length == 0) {
-          const temp = 1.0;
-          const top_p_usual = 0.8;
-          //let token = greedySampling(results.x.data);
-          let token = npsample(Object.values(results.x.data), temp, top_p_usual);
+          let token;
+          if (multinomialSampling) {
+            console.log('doing multinomial sampling with temp', temp, 'and topP', topP);
+            token = npsample(Object.values(results.x.data), temp, topP);
+          } else {
+            console.log('doing greedy sampling');
+            token = greedySampling(results.x.data);
+          }
 
           if(streamingCallback) streamingCallback(token);
           ctx.push( token );
@@ -381,10 +400,18 @@ Sam:">chat</option>
 	    
       let promptText = promptInputEl.value;
       let numTokensToGenerate = Number(numTokensToGenInputEl.value);
+
+      const promptTextLen = promptText.length;
       
-      async function streamingCallback(token) {
+      function streamingCallback(token) {
         let text = tokensToText([token]);
         promptInputEl.value += text;
+        promptInputEl.focus();
+        promptInputEl.selectionStart = promptTextLen;
+        promptInputEl.selectionEnd = promptInputEl.value.length;
+        setTimeout(() => {
+          promptInputEl.focus();
+        }, 0);
       }
       
       let result = await predictText(promptText, numTokensToGenerate, streamingCallback, abortSignal).catch((err) => {
