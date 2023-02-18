@@ -86,7 +86,7 @@ async function createOrtSession(onnxModelBlob, isOrtFile, backend, n_layer, n_em
   const session = await ort.InferenceSession.create(onnxModelBlobUrl, sessionOptions);
   URL.revokeObjectURL(onnxModelBlobUrl);
 
-  async function predictText(promptText, numTokensToGenerate=32, streamingCallback=null, abortSignal=undefined, samplingMethod='multinomial', temperature=1.0, topP=0.8, show_other_tokens = false) {
+  async function predictText(promptText, numTokensToGenerate=32, streamingCallback=null, abortSignal=undefined, samplingMethod='multinomial', temperature=1.0, topP=0.8, repetitivePenality = 0, show_other_tokens = false) {
   
     let startTime = Date.now();
     
@@ -109,15 +109,15 @@ async function createOrtSession(onnxModelBlob, isOrtFile, backend, n_layer, n_em
     
     let promptTokens = textToTokens(promptText);
     const origPromptTokensLength = promptTokens.length;
-    let ctx = [ promptTokens.shift() ];
+    const ctx = [ promptTokens.shift() ];
     if (streamingCallback) streamingCallback({ token: ctx[0], status: 'Reading prompt', i: 1, outOf: origPromptTokensLength});
     
     const multinomialSampling = samplingMethod === 'multinomial';
     
     if (multinomialSampling) {
-      console.log('doing multinomial sampling with temp', temperature, 'and topP', topP);
+      console.log('doing multinomial sampling with temp', temperature, 'and topP', topP, 'and repetitivePenality', repetitivePenality);
     } else {
-      console.log('doing greedy sampling');
+      console.log('doing greedy sampling with repetitivePenality', repetitivePenality);
     }
     
     
@@ -135,35 +135,33 @@ async function createOrtSession(onnxModelBlob, isOrtFile, backend, n_layer, n_em
       if(abortSignal && abortSignal.cancelled) {
         break;
       }
-      
+
+      let token;
       if (promptTokens.length == 0) {
-        let token;
         let other_tokens;
         if (multinomialSampling) {
           const data = Object.values(results.x.data);
-          console.log('doing multinomial sampling with temp', temperature, 'and topP', topP);
           if (streamingCallback && show_other_tokens) {
-            const probs = getMultinomialProbs(data, temperature, topP);
+            const probs = getMultinomialProbs(applyRepetitionPenalty(data, ctx, repetitivePenality), temperature, topP);
             token = choiceIndex(probs);
             other_tokens = [];
             for (let i = 0; i < probs.length; i++) {
               if(i != token && probs[i] > 0) other_tokens.push(i);
             }
-
           } else {
-            token = npsample(data, temperature, topP);
+            token = npsample(data, temperature, topP, ctx, repetitivePenality);
           }
         } else {
-          token = greedySampling(results.x.data);
+          token = greedySampling(results.x.data, ctx, repetitivePenality);
         }
         
         if (streamingCallback) streamingCallback({ token: token, other_tokens: other_tokens, status: 'Output', i: i+1 - origPromptTokensLength, outOf: numTokensToGenerate - origPromptTokensLength});
-        ctx.push( token );
+
       } else {
-        const token = promptTokens.shift();
-        ctx.push( token );
+        token = promptTokens.shift();
         if (streamingCallback) streamingCallback({ token: token, status: 'Reading prompt', i: i+1, outOf: origPromptTokensLength});
       }
+      ctx.push(token);
       
       feeds.xx_att = results.xx_att_r;
       feeds.aa_att = results.aa_att_r;

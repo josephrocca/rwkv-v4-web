@@ -1,8 +1,10 @@
-function greedySampling(x) {
+function greedySampling(x, tokenHistory = undefined, repetition_penalty = 0) {
+  x = applyRepetitionPenalty(x, tokenHistory, repetition_penalty)
   let max_k = 0;
   let max_v = x[0];
+  const n = x.length;
   
-  for (let i = 1; i < 50277; i++) {
+  for (let i = 1; i < n; i++) {
     if (x[i] > max_v) {
       max_v = x[i];
       max_k = i;
@@ -44,6 +46,15 @@ function find_cutoff(probs, top_p_usual) {
   */
 }
 
+function applyRepetitionPenalty(ozut, tokenHistory, repetition_penalty) {
+  if (tokenHistory && repetition_penalty !== 0) {
+    tokenHistory.forEach((token, i) =>
+      ozut[token]=ozut[token] - repetition_penalty
+    )
+  }
+  return ozut;
+}
+
 function getMultinomialProbs(ozut, temp = 1.0, top_p_usual = 0.8) {
   var probs = softmax(ozut);
   
@@ -61,8 +72,8 @@ function getMultinomialProbs(ozut, temp = 1.0, top_p_usual = 0.8) {
 //  ozut = [-1, 0, 3, 5]
 // where this means that token 0 is least likely, token 1 next likely, then token 2, then token 3
 // instead of just choosing token 3, we instead return one randomly, but making token the most likely etc.
-function npsample(ozut, temp = 1.0, top_p_usual = 0.8) {  
-  return choiceIndex(getMultinomialProbs(ozut, temp, top_p_usual));
+function npsample(ozut, temp = 1.0, top_p_usual = 0.8, tokenHistory = undefined, repetition_penalty = 0) {  
+  return choiceIndex(getMultinomialProbs(applyRepetitionPenalty(ozut, tokenHistory, repetition_penalty), temp, top_p_usual));
 }
 
 /**
@@ -76,8 +87,7 @@ function npsample(ozut, temp = 1.0, top_p_usual = 0.8) {
  * let index = cumprobs.findIndex(y => y > x);
  * return index;
  *
- * But multiple orders of magnitude faster.  The reduce was very very slow.
- * Also do a bisection for the findIndex
+ * But multiple orders of magnitude faster
  */
 function choiceIndex(p) {
   const n = p.length;
@@ -112,5 +122,5 @@ function softmax(data, from = 0, to = data.length) {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = {greedySampling, npsample, softmax, choiceIndex, find_cutoff, getMultinomialProbs};
+  module.exports = {greedySampling, npsample, softmax, choiceIndex, find_cutoff, getMultinomialProbs, applyRepetitionPenalty};
 }

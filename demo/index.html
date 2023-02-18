@@ -136,9 +136,10 @@ Sam:">chat</option>
         <option value="greedy">Greedy</option>
       </select>
       <div id="multinomialOptions">
-        <div>temp:<input id="tempEl" value="0.5" style="width:60px;"></div>
-        <div>top_p:<input id="topPEl" value="0.8" style="width:60px;"></div>
+        <div title="Value close to 0 makes the model more predictable. Above 1 boosts the chance of a more random output">Temperature:<input id="tempEl" value="0.5" style="width:60px;"></div>
+        <div title="The closer to 1, the more we will ignore tokens with low value from the model">Top p:<input id="topPEl" value="0.8" style="width:60px;"></div>
       </div>
+      <div title="0 means no penalty.  Any higher number counts against the model">Repetitive penalty:<input id="repPenaltyEl" value="1" style="width:60px;"></div>
     </div>
     <div style="display:flex; width: 100%; gap: 20px;">
       <textarea id="promptInputEl" style="width: 50%; height:250px;"></textarea>
@@ -268,8 +269,9 @@ Sam:">chat</option>
       const samplingMethod = samplingSelectorEl.value;
       const temperature = parseFloat(tempEl.value);
       const topP = parseFloat(topPEl.value);
+      const repetativePenality = parseFloat(repPenaltyEl.value);
       const show_other_tokens = true;
-      let result = await session.predictText(promptText, numTokensToGenerate, streamingCallback, abortSignal, samplingMethod, temperature, topP, show_other_tokens).catch((err) => {
+      let result = await session.predictText(promptText, numTokensToGenerate, streamingCallback, abortSignal, samplingMethod, temperature, topP, repetativePenality, show_other_tokens).catch((err) => {
         errorMessageEl.innerHTML = err;
         console.error(err);
       });
