@@ -81,23 +81,12 @@ function npsample(ozut, temp = 1.0, top_p_usual = 0.8) {
  */
 function choiceIndex(p) {
   const n = p.length;
-  let cumprobs = new Array(n);
-  cumprobs[0] = p[0];
-  for (let i = 1; i < n; i++) {
-    cumprobs[i] = cumprobs[i - 1] + p[i];
+  let x = Math.random();
+  for (let i = 0; i < n; i++) {
+    x -= p[i];
+    if (x <= 0) return i;
   }
-  const x = Math.random();
-  let left = 0;
-  let right = n - 1;
-  while (left < right) {
-    const mid = Math.floor((left + right) / 2);
-    if (cumprobs[mid] < x) {
-      left = mid + 1;
-    } else {
-      right = mid;
-    }
-  }
-  return left;
+  return p[n-1]; // should never happen
 }
 
 function softmax(data, from = 0, to = data.length) {
