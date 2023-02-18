@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width">
   <title>RWKV-v4 Web Demo</title>
   <script src="github-pages-coop-coep-workaround.js"></script> <!-- This allows us to use wasm threads on Github Pages. -->
+  <script src="sample.js"></script> <!-- This allows us to use wasm threads on Github Pages. -->
 </head>
 <body>
   <h1>RWKV-v4 Web Demo</h1>
@@ -205,21 +206,6 @@ Sam:">chat</option>
       return arr;
     }
 
-    function greedySampling(x) {
-      let max_k = 0;
-      let max_v = x[0];
-
-      for (let i = 1; i < 50277; i++) {
-        if (x[i] > max_v) {
-          max_v = x[i];
-          max_k = i;
-        }
-      }
-
-      return max_k;
-    }
-
-
     function downloadBlobWithProgress(url, onProgress) {
       return new Promise((res, rej) => {
         var xhr = new XMLHttpRequest();
@@ -348,9 +334,13 @@ Sam:">chat</option>
           progressDisplayEl.innerHTML = "";
           break;
         }
-        let token = greedySampling(results.x.data);
 
         if (promptTokens.length == 0) {
+          const temp = 1.0;
+          const top_p_usual = 0.8;
+          //let token = greedySampling(results.x.data);
+          let token = npsample(Object.values(results.x.data), temp, top_p_usual);
+
           if(streamingCallback) streamingCallback(token);
           ctx.push( token );
           progressDisplayEl.innerHTML = `Output Progress: ${i+1 - origPromptTokensLength}/${numTokensToGenerate - origPromptTokensLength}`;
@@ -397,7 +387,10 @@ Sam:">chat</option>
         promptInputEl.value += text;
       }
       
-      let result = await predictText(promptText, numTokensToGenerate, streamingCallback, abortSignal);
+      let result = await predictText(promptText, numTokensToGenerate, streamingCallback, abortSignal).catch((err) => {
+        errorMessageEl.innerHTML = err;
+        console.error(err);
+      });
       
       console.log(result);
 			

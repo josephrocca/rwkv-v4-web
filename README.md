@@ -36,6 +36,14 @@ If you hit the huggingface endpoint too often, it will start failing your downlo
 
 I recommend downloading the onnx file (e.g. `https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m-uint8.onnx`) into the `demo/` folder, then using the `load local copy` button.
 
+## Running tests
+
+Run tests with:
+
+```
+npx jest
+```
+
 **TODO**:
 * Optimise loop per AXKuhta's recommendations: https://github.com/BlinkDL/RWKV-LM/issues/7#issuecomment-1227341575
 * Speed up the initial-state-computation when the code becomes available: https://github.com/BlinkDL/RWKV-LM/issues/7#issuecomment-1228739721
