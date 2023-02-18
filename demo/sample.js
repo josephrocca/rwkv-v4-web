@@ -121,6 +121,7 @@ function softmax(data, from = 0, to = data.length) {
 
   return result;
 }
-if(typeof module !== 'undefined') {
+
+if (typeof module !== 'undefined') {
   module.exports = {greedySampling, npsample, softmax, choiceIndex, find_cutoff, getMultinomialProbs};
 }
