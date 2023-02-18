@@ -117,18 +117,18 @@
     <div style="display:flex; gap:10px">
       <select id="exampleSelectorEl" onchange="promptInputEl.value=this.value;" style="display:block;">
         <option default value="The capital of Australia is Canberra.
-  The capital of France is Paris.
-  The capital of Peru is">country capitals</option>
+The capital of France is Paris.
+The capital of Peru is">country capitals</option>
         <option value="7*3=21
-  21+2=23
-  1+2*4=9
-  7*2+31=">basic math</option>
+21+2=23
+1+2*4=9
+7*2+31=">basic math</option>
         <option value="QUESTION: The house is empty. Two people talk into the house. One person walks out, but then walks back in. A dog walks into the house. A person walks out of the house. How many people are in the house?
-  ANSWER: Let's think step by step. First,">word problem</option>
+ANSWER: Let's think step by step. First,">word problem</option>
         <option value="Jamie: Hey, did you hear the news?
-  Sam: No, what happened?
-  Jamie: They're finally trialling gene drives to combat malaria in Nigeria!
-  Sam:">chat</option>
+Sam: No, what happened?
+Jamie: They're finally trialling gene drives to combat malaria in Nigeria!
+Sam:">chat</option>
         <option value="dog --> fur --> soft --> teddy --> bear --> mammal --> taxonomy --> hierarchy --> king --> medieval -->">relationship chain</option>
       </select>
       <select id="samplingSelectorEl" onchange="samplingSelectorEl.value=this.value; multinomialOptions.style.display= (this.value === 'multinomial' ? 'contents':'none')" style="display:block;">
@@ -253,7 +253,7 @@
         if(token) {
           let text = tokensToText([token]);
           const ol = other_tokens ? other_tokens.length : 0;
-          htmloutput.innerHTML += `<span style="color:${status === "Output" ? "blue" : "green"};${ol ? 'text-decoration: underline dotted red;' : ''}">${text}${ol ? `<span style="color:gray; font-size: smaller;">${ol}</span>`:''}</span>`;
+          htmloutput.innerHTML += `<span style="color:${status === "Output" ? "blue" : "green"};${ol ? 'text-decoration: underline dotted gray;' : ''}">${text}${ol ? `<sub style="color:gray; font-size: smaller;" title="chosen from ${ol} possible tokens">${ol}</sub>`:''}</span>`;
           if(status === "Output") {
             promptInputEl.value += text;
             promptInputEl.focus();
