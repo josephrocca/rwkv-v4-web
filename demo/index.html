@@ -333,6 +333,13 @@
       const multinomialSampling = samplingSelectorEl.value === 'multinomial';
       const temp = parseFloat(tempEl.value);
       const topP = parseFloat(topPEl.value);
+
+      if (multinomialSampling) {
+        console.log('doing multinomial sampling with temp', temp, 'and topP', topP);
+      } else {
+        console.log('doing greedy sampling');
+      }
+
       
       // feed inputs and run
       for (var i = 0; i < numTokensToGenerate; i++) {
@@ -356,7 +363,6 @@
             console.log('doing multinomial sampling with temp', temp, 'and topP', topP);
             token = npsample(Object.values(results.x.data), temp, topP);
           } else {
-            console.log('doing greedy sampling');
             token = greedySampling(results.x.data);
           }
 
