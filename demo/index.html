@@ -253,7 +253,7 @@ Sam:">chat</option>
         if(token) {
           let text = tokensToText([token]);
           const ol = other_tokens ? other_tokens.length : 0;
-          htmloutput.innerHTML += `<span style="color:${status === "Output" ? "blue" : "green"};${ol ? 'text-decoration: underline dotted gray;' : ''}">${text}${ol ? `<sub style="color:gray; font-size: smaller;" title="chosen from ${ol} possible tokens">${ol}</sub>`:''}</span>`;
+          htmloutput.innerHTML += `<span style="color:${status === "Output" ? "blue" : "green"};${ol ? 'text-decoration: underline dotted gray;' : ''}" ${ol ? `title="chosen from ${ol+1} possible tokens"` : ''}>${text}${ol ? `<sub style="color:gray; font-size: smaller;">${ol+1}</sub>` : ''}</span>`;
           if(status === "Output") {
             promptInputEl.value += text;
             promptInputEl.focus();
