@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width">
   <title>RWKV-v4 Web Demo</title>
   <script src="github-pages-coop-coep-workaround.js"></script> <!-- This allows us to use wasm threads on Github Pages. -->
+  <script src="sample.js"></script>
+  <script src="code.js"></script>
 </head>
 <body>
   <h1>RWKV-v4 Web Demo</h1>
@@ -29,6 +31,7 @@
         <td>~32 tokens/sec</td>
         <td>-</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m.onnx'; modelNumLayersEl.value='12'; modelEmbedDimEl.value='768'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
+        <td> <button onclick="modelUrlInputEl.value='http://localhost:8080/rwkv-4-pile-169m.onnx'; modelNumLayersEl.value='12'; modelEmbedDimEl.value='768'; backendEl.value='wasm'; loadBtnEl.click();">load local copy</button> </td>
       </tr>
       <tr>
         <td>rwkv-4-pile-169m-uint8.onnx</td>
@@ -37,6 +40,7 @@
         <td>~12 tokens/sec</td>
         <td>uint8 quantized - smaller but slower</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m-uint8.onnx'; modelNumLayersEl.value='12'; modelEmbedDimEl.value='768'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
+        <td> <button onclick="modelUrlInputEl.value='http://localhost:8080/rwkv-4-pile-169m-uint8.onnx'; modelNumLayersEl.value='12'; modelEmbedDimEl.value='768'; backendEl.value='wasm'; loadBtnEl.click();">load local copy</button> </td>
       </tr>
       <tr>
         <td>rwkv-4-pile-169m-webgl.onnx</td>
@@ -45,6 +49,7 @@
         <td>~16 tokens/sec</td>
         <td><a href="https://github.com/BlinkDL/RWKV-LM/issues/7#issuecomment-1225906768" target="_blank">webgl-compatible</a></td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/169m/rwkv-4-pile-169m-webgl.onnx'; modelNumLayersEl.value='12'; modelEmbedDimEl.value='768'; backendEl.value='webgl'; loadBtnEl.click();">load</button> </td>
+        <td> <button onclick="modelUrlInputEl.value='http://localhost:8080/rwkv-4-pile-169m-webgl.onnx'; modelNumLayersEl.value='12'; modelEmbedDimEl.value='768'; backendEl.value='webgl'; loadBtnEl.click();">load local copy</button> </td>
       </tr>
       <tr style="opacity:0.3;">
         <td>rwkv-4-pile-430m.onnx</td>
@@ -53,6 +58,7 @@
         <td>?</td>
         <td style="color:red;">"RuntimeError: Aborted()" - too big to init</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/430m/rwkv-4-pile-430m.onnx'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
+        <td> <button onclick="modelUrlInputEl.value='http://localhost:8080/rwkv-4-pile-430m.onnx'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='wasm'; loadBtnEl.click();">load local copy</button> </td>
       </tr>
       <tr>
         <td>rwkv-4-pile-430m.with_runtime_opt.ort</td>
@@ -61,6 +67,7 @@
         <td>~12 tokens/sec</td>
         <td>ORT format</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/430m/rwkv-4-pile-430m.with_runtime_opt.ort'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
+        <td> <button onclick="modelUrlInputEl.value='http://localhost:8080/rwkv-4-pile-430m.with_runtime_opt.ort'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='wasm'; loadBtnEl.click();">load local copy</button> </td>
       </tr>
       <tr>
         <td>rwkv-4-pile-430m-uint8.onnx</td>
@@ -69,6 +76,7 @@
         <td>~4 tokens/sec</td>
         <td>uint8 quantized - smaller but slower</td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/430m/rwkv-4-pile-430m-uint8.onnx'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='wasm'; loadBtnEl.click();">load</button> </td>
+        <td> <button onclick="modelUrlInputEl.value='http://localhost:8080/rwkv-4-pile-430m-uint8.onnx'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='wasm'; loadBtnEl.click();">load local copy</button> </td>
       </tr>
       <tr>
         <td>rwkv-4-pile-430m-webgl.onnx</td>
@@ -77,6 +85,7 @@
         <td>~10 tokens/sec</td>
         <td><a href="https://github.com/BlinkDL/RWKV-LM/issues/7#issuecomment-1225906768" target="_blank">webgl-compatible</a></td>
         <td> <button onclick="modelUrlInputEl.value='https://huggingface.co/rocca/rwkv-4-pile-web/resolve/main/430m/rwkv-4-pile-430m-webgl.onnx'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='webgl'; loadBtnEl.click();">load</button> </td>
+        <td> <button onclick="modelUrlInputEl.value='http://localhost:8080/rwkv-4-pile-430m-webgl.onnx'; modelNumLayersEl.value='24'; modelEmbedDimEl.value='1024'; backendEl.value='webgl'; loadBtnEl.click();">load local copy</button> </td>
       </tr>
     </table>
     <style>
@@ -105,28 +114,44 @@
    
   <div id="inputAreaEl" style="display:none;">
     <div id="modelInfoDisplayEl" style="opacity:0.5"></div>
-    <select id="exampleSelectorEl" onchange="promptInputEl.value=this.value;" style="display:block;">
-      <option value="The capital of Australia is Canberra.
-The capital of France is Paris.
-The capital of Peru is">country capitals</option>
-      <option value="7*3=21
-21+2=23
-1+2*4=9
-7*2+31=">basic math</option>
-      <option value="QUESTION: The house is empty. Two people talk into the house. One person walks out, but then walks back in. A dog walks into the house. A person walks out of the house. How many people are in the house?
-ANSWER: Let's think step by step. First,">word problem</option>
-      <option value="Jamie: Hey, did you hear the news?
-Sam: No, what happened?
-Jamie: They're finally trialling gene drives to combat malaria in Nigeria!
-Sam:">chat</option>
-      <option value="dog --> fur --> soft --> teddy --> bear --> mammal --> taxonomy --> hierarchy --> king --> medieval -->">relationship chain</option>
-    </select>
-    <textarea id="promptInputEl" style="width:550px; height:250px;"></textarea>
+    <div style="display:flex; gap:10px">
+      <select id="exampleSelectorEl" onchange="promptInputEl.value=this.value;" style="display:block;">
+        <option default value="The capital of Australia is Canberra.
+  The capital of France is Paris.
+  The capital of Peru is">country capitals</option>
+        <option value="7*3=21
+  21+2=23
+  1+2*4=9
+  7*2+31=">basic math</option>
+        <option value="QUESTION: The house is empty. Two people talk into the house. One person walks out, but then walks back in. A dog walks into the house. A person walks out of the house. How many people are in the house?
+  ANSWER: Let's think step by step. First,">word problem</option>
+        <option value="Jamie: Hey, did you hear the news?
+  Sam: No, what happened?
+  Jamie: They're finally trialling gene drives to combat malaria in Nigeria!
+  Sam:">chat</option>
+        <option value="dog --> fur --> soft --> teddy --> bear --> mammal --> taxonomy --> hierarchy --> king --> medieval -->">relationship chain</option>
+      </select>
+      <select id="samplingSelectorEl" onchange="samplingSelectorEl.value=this.value; multinomialOptions.style.display= (this.value === 'multinomial' ? 'contents':'none')" style="display:block;">
+        <option default value="multinomial">Multinomial sampling</option>
+        <option value="greedy">Greedy</option>
+      </select>
+      <div id="multinomialOptions">
+        <div>temp:<input id="tempEl" value="0.5" style="width:60px;"></div>
+        <div>top_p:<input id="topPEl" value="0.8" style="width:60px;"></div>
+      </div>
+    </div>
+    <div style="display:flex; width: 100%; gap: 20px;">
+      <textarea id="promptInputEl" style="width: 50%; height:250px;"></textarea>
+      <div id="htmloutput" style="width: 50%; white-space: pre-wrap;"></div>
+    </div>
     <script>
       promptInputEl.value = exampleSelectorEl.querySelectorAll("option")[0].value;
+      multinomialOptions.style.display = "contents";
     </script>
     <div>Num output tokens (including prompt): <input id="numTokensToGenInputEl" type="number" value="128" style="width:60px;"> <span id="progressDisplayEl"></span> <span id="tokensPerSecDisplayEl" style="opacity:0.6"></span></div>
     <button id="generateButtonEl">generate text</button>
+    <div id="errorMessageEl" style="display:block; color: red;">
+    </div>
   </div>
   
   <script src="https://cdn.jsdelivr.net/pyodide/v0.21.0a2/full/pyodide.js"></script>
@@ -135,7 +160,7 @@ Sam:">chat</option>
   <script type="module">
     
     await new Promise(r => window.resolveLoadClick=r); // wait for load button click
-    
+
     let onnxModelUrl = modelUrlInputEl.value;
     let n_layer = Number(modelNumLayersEl.value);
     let n_embd = Number(modelEmbedDimEl.value);
@@ -145,222 +170,119 @@ Sam:">chat</option>
     
     modelChoiceEl.style.display = "none";
     loadingMessageEl.style.display = "";
-
-    window.pyodide = await loadPyodide();
-    await pyodide.loadPackage("micropip");
-
-    // Add tokenizer.json file to Pyodide filesystem:
-    let tokenizerJsonText = await fetch("./tokenizer.json").then(r => r.text())
-    pyodide.FS.writeFile("/tokenizer.json", tokenizerJsonText, { encoding: "utf8" });
-
-    // Install tokenizer:
-    console.log(await pyodide.runPythonAsync(`
-      import sys
-      print(sys.version)
-      import os
-      os.environ["TOKENIZERS_PARALLELISM"] = "0" # This is needed because threading doesn't work in Pyodide yet: https://github.com/pyodide/pyodide/issues/2816#issue-1290719241
-      import micropip
-      await micropip.install('./tokenizers_python-0.11.0-cp310-cp310-emscripten_3_1_14_wasm32.whl')
-      from tokenizers import Tokenizer
-      tokenizer = Tokenizer.from_file("/tokenizer.json")
-    `));
-    
-    function textToTokens(text) {
-      pyodide.globals.set("input_text", text);
-      pyodide.runPython(`
-        encoded = tokenizer.encode(input_text)
-        ids = encoded.ids
-        tokens = encoded.tokens
-      `);
-      // pyodide.globals.get('tokens').toJs()
-      return pyodide.globals.get('ids').toJs();
-    }
-    
-    function tokensToText(tokens) {
-      pyodide.globals.set("input_tokens", tokens.join(","));
-      pyodide.runPython(`
-        input_tokens = [int(x) for x in input_tokens.split(',')]
-        decoded = tokenizer.decode(input_tokens)
-      `);
-      return pyodide.globals.get('decoded');
-    }
-    
-    function padLeftWithZeros(arr, size) {
-      arr = arr.slice(0);
-
-      while (arr.length < size) {
-        arr.unshift(0);
-      }
-
-      return arr;
-    }
-
-    function greedySampling(x) {
-      let max_k = 0;
-      let max_v = x[0];
-
-      for (let i = 1; i < 50277; i++) {
-        if (x[i] > max_v) {
-          max_v = x[i];
-          max_k = i;
-        }
-      }
-
-      return max_k;
-    }
-
+    errorMessageEl.innerHTML = "";
+    await pyodideInit();
 
     function downloadBlobWithProgress(url, onProgress) {
       return new Promise((res, rej) => {
-        var blob;
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'arraybuffer';
         xhr.onload = function(e) {
-          blob = new Blob([this.response]);   
+          if ((xhr.status >= 200 && xhr.status < 300) || (xhr.status === 0 /* Loaded from local file */)) {
+            res(new Blob([this.response]));
+          } else if(xhr.status === 404 && url.startsWith('http://localhost')) {
+            rej(`Model not found locally.  Please download and place in the demo/ folder.  Make sure you are running on port 8080`);
+          } else {
+            console.log('onload: Loading model error', xhr, e);
+            rej(`Loading model error: ${xhr.status}: ${xhr.statusText}`);
+          }
         };
         xhr.onprogress = onProgress;
-        xhr.onloadend = function(e){
-          res(blob);
+        xhr.onerror = function(e){
+          console.log('onerror: Loading model error', xhr, e);
+          if (xhr.status === 0 && !xhr.statusText) {
+            // There's no information to show
+            // https://bugs.chromium.org/p/chromium/issues/detail?id=118096
+            rej('Failed to load the model.  This can happen if you are hitting the end point too often.  Try just waiting and trying again a bit later.')
+          } else {
+            rej(`Loading model error: ${xhr.status}: ${xhr.statusText}`);
+          }
         }
         xhr.send();
       });
     }
-
-
     let session;
     try {
-      ort.env.wasm.proxy = true; // <-- When using wasm, proxy inference via a web worker so it doesn't freeze the main/rendering thread.
-      
-      if(self.crossOriginIsolated) { // needs to be cross-origin-isolated to use wasm threads. you need to serve this html file with these two headers: https://web.dev/coop-coep/
-        ort.env.wasm.numThreads = navigator.hardwareConcurrency / 2;
-      }
-      
-      ort.logLevel = "verbose";
-      ort.logLevelInternal = "verbose";
-
-      let sessionOptions = {
-        executionProviders: [ backend ],
-        graphOptimizationLevel: 'all',
-      };
-	    
-      if(new URL(onnxModelUrl).pathname.endsWith(".ort")) {
-        // See here for details: github.com/microsoft/onnxruntime/issues/13445#issuecomment-1430153341
-        sessionOptions = {
-          executionProviders: [ backend ],
-          enableMemPattern: false,
-          enableCpuMemArena: false,
-          extra: {
-            session: {
-              disable_prepacking: "1",
-              use_device_allocator_for_initializers: "0",
-              use_ort_model_bytes_directly: "1",
-              use_ort_model_bytes_for_initializers: "1",
-            },
-          },
-        };
-      }
-
       let onnxModelBlob = await downloadBlobWithProgress(onnxModelUrl, function(e) {
         let ratio = e.loaded / e.total;
         downloadProgressEl.value = ratio;
         loadingStatusEl.innerHTML = "Downloading..." + Math.round(ratio*e.total/1e6)+" MB";
       });
-
-      loadingStatusEl.innerHTML = "Initializing...";
-      
-      let onnxModelBlobUrl = URL.createObjectURL(onnxModelBlob);
-
-      session = await ort.InferenceSession.create(onnxModelBlobUrl, sessionOptions);
-      
-      URL.revokeObjectURL(onnxModelBlobUrl);
-      
-    } catch (e) {
-      console.log(`Failed to load ONNX model: ${e}.`);
-      console.error(e);
-    }
-    
-    async function predictText(promptText, numTokensToGenerate=32, streamingCallback=null) {
-
-      let startTime = Date.now();
-
-      const xx_att_d = new Float32Array(n_layer*n_embd);
-      const aa_att_d = new Float32Array(n_layer*n_embd);
-      const bb_att_d = new Float32Array(n_layer*n_embd);
-      const pp_att_d = new Float32Array(n_layer*n_embd);
-      const xx_ffn_d = new Float32Array(n_layer*n_embd);
-
-      pp_att_d.fill(-1e30);
-
-      const xx_att = new ort.Tensor('float32', xx_att_d, [n_layer, n_embd]);
-      const aa_att = new ort.Tensor('float32', aa_att_d, [n_layer, n_embd]);
-      const bb_att = new ort.Tensor('float32', bb_att_d, [n_layer, n_embd]);
-      const pp_att = new ort.Tensor('float32', pp_att_d, [n_layer, n_embd]);
-      const xx_ffn = new ort.Tensor('float32', xx_ffn_d, [n_layer, n_embd]);
-
-      // prepare feeds. use model input names as keys.
-      let feeds = { idx: null, xx_att: xx_att, aa_att: aa_att, bb_att: bb_att, pp_att: pp_att, xx_ffn: xx_ffn };
-
-      let promptTokens = textToTokens(promptText);
-      let ctx = [ promptTokens.shift() ];
-
-      // feed inputs and run
-      for (let i = 0; i < numTokensToGenerate; i++) {
-        let idx_d = Int32Array.from( padLeftWithZeros(ctx, 1024) );
-        let idx = new ort.Tensor('int32', idx_d, [1024]);
-
-        feeds.idx = idx;
-
-        let results = await session.run(feeds);
-        let token = greedySampling(results.x.data);
-
-        if (promptTokens.length == 0) {
-          if(streamingCallback) streamingCallback(token);
-          ctx.push( token );
-        } else {
-          ctx.push( promptTokens.shift() );
-        }
-
-        feeds.xx_att = results.xx_att_r;
-        feeds.aa_att = results.aa_att_r;
-        feeds.bb_att = results.bb_att_r;
-        feeds.pp_att = results.pp_att_r;
-        feeds.xx_ffn = results.xx_ffn_r;
-
-        progressDisplayEl.innerHTML = `Progress: ${i+1}/${numTokensToGenerate}`;
+      if (!onnxModelBlob) {
+        throw new Error("Failed to download model");
       }
-      
-      let timeTaken = Date.now() - startTime;
-      console.log(`Finished. Took ${timeTaken}ms`);
-      tokensPerSecDisplayEl.innerHTML = `(${(numTokensToGenerate/(timeTaken/1000)).toFixed(2)} tokens/sec)`;
-
-      return tokensToText(ctx);
-    }
-    
+      loadingStatusEl.innerHTML = "Initializing...";
+      session = await createOrtSession(onnxModelBlob, new URL(onnxModelUrl).pathname.endsWith(".ort"), backend, n_layer, n_embd);
+    } catch (e) {
+      const errStr = `Failed to load ONNX model: ${e}.`;
+      console.log(errStr);
+      errorMessageEl.innerHTML=errStr;
+      console.error(e);
+    }   
     inputAreaEl.style.display = "";
     loadingMessageEl.style.display = "none";
     
-    generateButtonEl.onclick = async function() {
-      generateButtonEl.disabled = true;
-      generateButtonEl.innerHTML = "Loading...";
+    const abortSignal = { cancelled: false }; 
+    async function stop() {
+      abortSignal.cancelled = true;
+    }
+    async function generate() {
+      abortSignal.cancelled = false;
+      generateButtonEl.disabled = false;
+      generateButtonEl.innerHTML = "Stop";
+      generateButtonEl.onclick = stop;
+      generateButtonEl.style.color = "red";
       
       tokensPerSecDisplayEl.innerHTMl = "";
+      htmloutput.innerHTML = "";
 	    
       let promptText = promptInputEl.value;
       let numTokensToGenerate = Number(numTokensToGenInputEl.value);
+
+      const promptTextLen = promptText.length;
       
-      async function streamingCallback(token) {
-        let text = tokensToText([token]);
-        promptInputEl.value += text;
+      function streamingCallback({token, other_tokens, status, i, outOf, tokensPerSec}) {
+        if(status === "Output" || status === "Reading prompt") {
+          progressDisplayEl.innerHTML = `${status} Progress: ${i}/${outOf}`;
+          tokensPerSecDisplayEl.innerHTML = '';
+        } else if (status === "Finished") {
+          progressDisplayEl.innerHTML = '';
+          tokensPerSecDisplayEl.innerHTML = `(${tokensPerSec.toFixed(2)} tokens/sec)`;
+        }
+        if(token) {
+          let text = tokensToText([token]);
+          const ol = other_tokens ? other_tokens.length : 0;
+          htmloutput.innerHTML += `<span style="color:${status === "Output" ? "blue" : "green"};${ol ? 'text-decoration: underline dotted red;' : ''}">${text}${ol ? `<span style="color:gray; font-size: smaller;">${ol}</span>`:''}</span>`;
+          if(status === "Output") {
+            promptInputEl.value += text;
+            promptInputEl.focus();
+            promptInputEl.selectionStart = promptTextLen;
+            promptInputEl.selectionEnd = promptInputEl.value.length;
+            setTimeout(() => {
+              promptInputEl.focus();
+            }, 0);
+          }
+        }
       }
-      
-      let result = await predictText(promptText, numTokensToGenerate, streamingCallback);
+      const samplingMethod = samplingSelectorEl.value;
+      const temperature = parseFloat(tempEl.value);
+      const topP = parseFloat(topPEl.value);
+      const show_other_tokens = true;
+      let result = await session.predictText(promptText, numTokensToGenerate, streamingCallback, abortSignal, samplingMethod, temperature, topP, show_other_tokens).catch((err) => {
+        errorMessageEl.innerHTML = err;
+        console.error(err);
+      });
       
       console.log(result);
 			
       generateButtonEl.disabled = false;
-      generateButtonEl.innerHTML = "generate";
+      generateButtonEl.innerHTML = "Generate";
+      generateButtonEl.onclick = generate;
+      generateButtonEl.style.color = "";
     };
+    generateButtonEl.onclick = generate;
+
     
   </script>
 </body>
