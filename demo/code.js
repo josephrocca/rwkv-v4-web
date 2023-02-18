@@ -86,7 +86,7 @@ async function createOrtSession(onnxModelBlob, isOrtFile, backend, n_layer, n_em
   const session = await ort.InferenceSession.create(onnxModelBlobUrl, sessionOptions);
   URL.revokeObjectURL(onnxModelBlobUrl);
 
-  async function predictText(promptText, numTokensToGenerate=32, streamingCallback=null, abortSignal=undefined, samplingMethod='multinomial', temperature=1.0, topP=0.8) {
+  async function predictText(promptText, numTokensToGenerate=32, streamingCallback=null, abortSignal=undefined, samplingMethod='multinomial', temperature=1.0, topP=0.8, show_other_tokens = false) {
   
     let startTime = Date.now();
     
@@ -110,6 +110,7 @@ async function createOrtSession(onnxModelBlob, isOrtFile, backend, n_layer, n_em
     let promptTokens = textToTokens(promptText);
     const origPromptTokensLength = promptTokens.length;
     let ctx = [ promptTokens.shift() ];
+    if (streamingCallback) streamingCallback({ token: ctx[0], status: 'Reading prompt', i: 1, outOf: origPromptTokensLength});
     
     const multinomialSampling = samplingMethod === 'multinomial';
     
@@ -137,19 +138,31 @@ async function createOrtSession(onnxModelBlob, isOrtFile, backend, n_layer, n_em
       
       if (promptTokens.length == 0) {
         let token;
+        let other_tokens;
         if (multinomialSampling) {
+          const data = Object.values(results.x.data);
           console.log('doing multinomial sampling with temp', temperature, 'and topP', topP);
-          token = npsample(Object.values(results.x.data), temperature, topP);
+          if (streamingCallback && show_other_tokens) {
+            const probs = getMultinomialProbs(data, temperature, topP);
+            token = choiceIndex(probs);
+            other_tokens = [];
+            for (let i = 0; i < probs.length; i++) {
+              if(i != token && probs[i] > 0) other_tokens.push(i);
+            }
+
+          } else {
+            token = npsample(data, temperature, topP);
+          }
         } else {
           token = greedySampling(results.x.data);
         }
         
-        if (streamingCallback) streamingCallback(token);
-        if (streamingCallback) streamingCallback({ token: token, status: 'Output', i: i+1 - origPromptTokensLength, outOf: numTokensToGenerate - origPromptTokensLength});
+        if (streamingCallback) streamingCallback({ token: token, other_tokens: other_tokens, status: 'Output', i: i+1 - origPromptTokensLength, outOf: numTokensToGenerate - origPromptTokensLength});
         ctx.push( token );
       } else {
-        ctx.push( promptTokens.shift() );
-        if (streamingCallback) streamingCallback({ status: 'Reading prompt', i: i+1, outOf: origPromptTokensLength});
+        const token = promptTokens.shift();
+        ctx.push( token );
+        if (streamingCallback) streamingCallback({ token: token, status: 'Reading prompt', i: i+1, outOf: origPromptTokensLength});
       }
       
       feeds.xx_att = results.xx_att_r;

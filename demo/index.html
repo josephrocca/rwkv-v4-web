@@ -140,7 +140,10 @@
         <div>top_p:<input id="topPEl" value="0.8" style="width:60px;"></div>
       </div>
     </div>
-    <textarea id="promptInputEl" style="width:550px; height:250px;"></textarea>
+    <div style="display:flex; width: 100%; gap: 20px;">
+      <textarea id="promptInputEl" style="width: 50%; height:250px;"></textarea>
+      <div id="htmloutput" style="width: 50%; white-space: pre-wrap;"></div>
+    </div>
     <script>
       promptInputEl.value = exampleSelectorEl.querySelectorAll("option")[0].value;
       multinomialOptions.style.display = "contents";
@@ -232,13 +235,14 @@
       generateButtonEl.style.color = "red";
       
       tokensPerSecDisplayEl.innerHTMl = "";
+      htmloutput.innerHTML = "";
 	    
       let promptText = promptInputEl.value;
       let numTokensToGenerate = Number(numTokensToGenInputEl.value);
 
       const promptTextLen = promptText.length;
       
-      function streamingCallback({token, status, i, outOf, tokensPerSec}) {
+      function streamingCallback({token, other_tokens, status, i, outOf, tokensPerSec}) {
         if(status === "Output" || status === "Reading prompt") {
           progressDisplayEl.innerHTML = `${status} Progress: ${i}/${outOf}`;
           tokensPerSecDisplayEl.innerHTML = '';
@@ -248,20 +252,24 @@
         }
         if(token) {
           let text = tokensToText([token]);
-          promptInputEl.value += text;
-          promptInputEl.focus();
-          promptInputEl.selectionStart = promptTextLen;
-          promptInputEl.selectionEnd = promptInputEl.value.length;
-          setTimeout(() => {
+          const ol = other_tokens ? other_tokens.length : 0;
+          htmloutput.innerHTML += `<span style="color:${status === "Output" ? "blue" : "green"};${ol ? 'text-decoration: underline dotted red;' : ''}">${text}${ol ? `<span style="color:gray; font-size: smaller;">${ol}</span>`:''}</span>`;
+          if(status === "Output") {
+            promptInputEl.value += text;
             promptInputEl.focus();
-          }, 0);
+            promptInputEl.selectionStart = promptTextLen;
+            promptInputEl.selectionEnd = promptInputEl.value.length;
+            setTimeout(() => {
+              promptInputEl.focus();
+            }, 0);
+          }
         }
       }
       const samplingMethod = samplingSelectorEl.value;
       const temperature = parseFloat(tempEl.value);
       const topP = parseFloat(topPEl.value);
-      
-      let result = await session.predictText(promptText, numTokensToGenerate, streamingCallback, abortSignal, samplingMethod, temperature, topP).catch((err) => {
+      const show_other_tokens = true;
+      let result = await session.predictText(promptText, numTokensToGenerate, streamingCallback, abortSignal, samplingMethod, temperature, topP, show_other_tokens).catch((err) => {
         errorMessageEl.innerHTML = err;
         console.error(err);
       });
