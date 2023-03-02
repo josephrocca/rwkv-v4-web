@@ -10,7 +10,7 @@
 </head>
 <body>
   <h1>RWKV-v4 Web Demo</h1>
-  <p>See <a href="https://github.com/josephrocca/rwkv-v4-web" target="_blank">the Github repo</a> for more details about this demo. The inference speed numbers are just for my laptop - consider them as relative numbers at most. Obviously varies by device. Note that opening the browser console/DevTools currently slows down inference, even after you close it.</p>
+  <p>See <a href="https://github.com/josephrocca/rwkv-v4-web" target="_blank">the Github repo</a> for more details about this demo. The inference speed numbers are just for my laptop using <b>Chrome</b> - consider them as relative numbers at most, since performance obviously varies by device. Note that opening the browser console/DevTools <a href="https://github.com/microsoft/onnxruntime/issues/14692" target="_blank">currently slows down inference</a>, even after you close it.</p>
   
   <hr>
 
@@ -195,7 +195,7 @@ Sam:">chat</option>
           if (xhr.status === 0 && !xhr.statusText) {
             // There's no information to show
             // https://bugs.chromium.org/p/chromium/issues/detail?id=118096
-            rej('Failed to load the model.  This can happen if you are hitting the end point too often.  Try just waiting and trying again a bit later.')
+            rej('Failed to load the model from Hugging Face. Might be related to a problem on their end.  Please try waiting a bit and then trying again, or use local copy (see README).')
           } else {
             rej(`Loading model error: ${xhr.status}: ${xhr.statusText}`);
           }
